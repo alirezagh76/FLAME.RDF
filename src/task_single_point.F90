@@ -127,7 +127,7 @@ subroutine read_poscar_for_single_point(parini,atoms)
     integer:: iat
     character(40):: filename
     logical:: file_exists
-    filename='posinp.vasp'
+    filename='CONTCAR'
     inquire(file=trim(filename),exist=file_exists)
     if (.not. file_exists) then 
         filename='POSCAR'
