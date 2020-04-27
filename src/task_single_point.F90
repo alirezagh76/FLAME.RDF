@@ -15,7 +15,7 @@ subroutine single_point_task(parini)
     type(typ_atoms_arr):: atoms_arr
     type(typ_file_info):: file_info
     real(8):: tt1, tt2, fxyz(3)
-    integer:: iconf, iat
+    integer:: iconf, iat, ios
     logical:: acf_exists, yaml_exists
     inquire(file='posinp.yaml',exist=yaml_exists)
     inquire(file='posinp.acf',exist=acf_exists)
@@ -51,6 +51,21 @@ subroutine single_point_task(parini)
             endif
             call yaml_sequence(advance='no')
             call cal_potential_forces(parini,atoms_arr%atoms(iconf))
+            if(iconf>1) then
+                stop 'ERROR: This is temporary branch for nconf=1'
+            else
+                open(unit=1234321,file='ENERGY_FORCES',status='replace',iostat=ios)
+                if(ios/=0) then
+                    write(*,*) 'ERROR: unable to open file ENERGY_FORCES'
+                    stop
+                endif
+                write(1234321,'(es24.15)') atoms_arr%atoms(iconf)%epot
+                do iat=1,atoms_arr%atoms(iconf)%nat
+                    write(1234321,'(3es24.15)') atoms_arr%atoms(iconf)%fat(1,iat), &
+                        atoms_arr%atoms(iconf)%fat(2,iat),atoms_arr%atoms(iconf)%fat(3,iat)
+                enddo
+                close(1234321)
+            endif
             !call atoms_all%fatall(1:3,1:atoms_all%atoms%nat,iconf)=atoms_all%atoms%fat(1:3,1:atoms_all%atoms%nat)
             if(iconf==1) then
                 tt1=0.d0
@@ -94,7 +109,7 @@ end subroutine single_point_task
 !*****************************************************************************************
 subroutine read_poscar_for_single_point(parini,atoms)
     use mod_parini, only: typ_parini
-    use mod_atoms, only: typ_atoms, atom_allocate_old, update_rat
+    use mod_atoms, only: typ_atoms, atom_allocate, update_rat
     use global, only: units
     implicit none
     type(typ_parini), intent(inout):: parini !poscar_getsystem must be called from parser
@@ -126,7 +141,7 @@ subroutine read_poscar_for_single_point(parini,atoms)
     if(.not.allocated(fragarr)) allocate(fragarr(parini%nat),source=0)
     atoms%nat=parini%nat
     atoms%boundcond='bulk'
-    call atom_allocate_old(atoms,parini%nat,0,0)
+    call atom_allocate(atoms,parini%nat,0,0)
     call read_atomic_file_poscar(filename,atoms%nat,units,xred,atoms%cellvec,fcart,strten, &
         fixat,fixlat,readfix,fragarr,readfrag,printval1,printval2)
     call rxyz_int2cart_alborz(atoms%nat,atoms%cellvec,xred,atoms%ratp)
