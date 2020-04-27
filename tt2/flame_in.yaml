@@ -1,0 +1,21 @@
+main:
+    task         : single_point
+    types        : Mg O 
+    verbosity    : 0
+
+potential:
+    potential    : ann
+    ewald:
+        ewald    : True
+        psolver  : kwald 
+        alpha    : 2.0
+        ewald_tol: 1.E-10
+        ecut_auto: True
+
+ann:
+    approach     : cent1
+    syslinsolver : operator
+
+single_point:
+    print_force  : True
+

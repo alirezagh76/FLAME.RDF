@@ -59,10 +59,12 @@ subroutine single_point_task(parini)
                     write(*,*) 'ERROR: unable to open file ENERGY_FORCES'
                     stop
                 endif
-                write(1234321,'(es24.15)') atoms_arr%atoms(iconf)%epot
+                write(1234321,'(es24.15)') atoms_arr%atoms(iconf)%epot*27.211385d0
                 do iat=1,atoms_arr%atoms(iconf)%nat
-                    write(1234321,'(3es24.15)') atoms_arr%atoms(iconf)%fat(1,iat), &
-                        atoms_arr%atoms(iconf)%fat(2,iat),atoms_arr%atoms(iconf)%fat(3,iat)
+                    write(1234321,'(3es24.15)') &
+                        atoms_arr%atoms(iconf)%fat(1,iat)*(27.211385d0/0.529177210d0), &
+                        atoms_arr%atoms(iconf)%fat(2,iat)*(27.211385d0/0.529177210d0), &
+                        atoms_arr%atoms(iconf)%fat(3,iat)*(27.211385d0/0.529177210d0)
                 enddo
                 close(1234321)
             endif
